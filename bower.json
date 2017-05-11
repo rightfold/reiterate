@@ -1,0 +1,7 @@
+{
+  "name": "reiterate",
+  "dependencies": {
+    "purescript-stuff": "^1.2.0",
+    "purescript-halogen": "^2.0.1"
+  }
+}
