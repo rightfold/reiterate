@@ -26,10 +26,10 @@ freshTopicID = TopicID <$> randomUUID4
 
 --------------------------------------------------------------------------------
 
-data Topic = Topic TopicID String Phase
+data Topic = Topic String Phase
 derive instance go :: Generic Topic
 instance so :: Show Topic where
-  show (Topic i n p) = "(Topic " <> show i <> " " <> show n <> " " <> show p <> ")"
+  show (Topic n p) = "(Topic " <> show n <> " " <> show p <> ")"
 
 --------------------------------------------------------------------------------
 

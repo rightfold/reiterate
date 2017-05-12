@@ -11,15 +11,15 @@ import Reiterate.Topic (Topic, TopicID)
 import Stuff
 
 data Topics a
-  = GetTopics (Error \/ List Topic -> a)
+  = GetTopics (Error \/ List (TopicID /\ Topic) -> a)
   | FreshTopic (Error \/ TopicID -> a)
-  | SaveTopic Topic (Error \/ Unit -> a)
+  | SaveTopic TopicID Topic (Error \/ Unit -> a)
 
-getTopics :: ExceptT Error (Free Topics) (List Topic)
+getTopics :: ExceptT Error (Free Topics) (List (TopicID /\ Topic))
 getTopics = wrap \ liftF $ GetTopics id
 
 freshTopic :: ExceptT Error (Free Topics) TopicID
 freshTopic = wrap \ liftF $ FreshTopic id
 
-saveTopic :: Topic -> ExceptT Error (Free Topics) Unit
-saveTopic = wrap \ liftF \ (SaveTopic <@> id)
+saveTopic :: TopicID -> Topic -> ExceptT Error (Free Topics) Unit
+saveTopic tid topic = wrap \ liftF $ SaveTopic tid topic id

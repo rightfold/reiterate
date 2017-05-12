@@ -13,11 +13,11 @@ import Halogen.Component (Component, ComponentDSL, ComponentHTML, lifecycleCompo
 import Halogen.HTML (HTML)
 import Halogen.HTML as H
 import Halogen.HTML.Events as E
-import Reiterate.Topic (Topic)
+import Reiterate.Topic (Topic, TopicID)
 import Reiterate.Topic.Algebra (Topics, freshTopic, getTopics)
 import Stuff
 
-type State = Error \/ List Topic
+type State = Error \/ List (TopicID /\ Topic)
 data Query a
   = Refresh a
   | NewTopic a
