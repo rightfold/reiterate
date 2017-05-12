@@ -7,18 +7,20 @@ module Reiterate.UI
   ) where
 
 import Control.Monad.Free (Free)
-import Control.Monad.State.Class as State
 import Control.Monad.Trans.Class (lift)
+import Data.Lens ((.=))
 import Halogen.Component (Component, ComponentDSL, ComponentHTML, lifecycleComponent)
 import Halogen.HTML (HTML)
 import Halogen.HTML as H
+import Halogen.HTML.Events as E
 import Reiterate.Topic (Topic)
-import Reiterate.Topic.Algebra (Topics, getTopics)
+import Reiterate.Topic.Algebra (Topics, freshTopic, getTopics)
 import Stuff
 
 type State = Error \/ List Topic
 data Query a
   = Refresh a
+  | NewTopic a
 type Input = Unit
 type Output = Void
 type Base = Free Topics
@@ -39,7 +41,18 @@ finalizer :: Maybe (Query Unit)
 finalizer = Nothing
 
 eval :: Query ~> ComponentDSL State Query Output Base
-eval (Refresh next) = next <$ (State.put =<< lift (unwrap getTopics))
+eval (Refresh next) = do
+  topics <- lift \ unwrap $ getTopics
+  id .= topics
+  pure next
+eval (NewTopic next) = do
+  tid <- lift \ unwrap $ freshTopic
+  eval $ Refresh next
 
 render :: State -> ComponentHTML Query
-render = H.text \ show
+render s =
+  H.div []
+    [ H.button [E.onClick \ E.input_ $ NewTopic]
+        [H.text "New Topic"]
+    , H.text $ show s
+    ]

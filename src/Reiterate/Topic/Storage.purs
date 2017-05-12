@@ -9,16 +9,24 @@ import Data.Argonaut.Decode.Generic (gDecodeJson)
 import Data.Argonaut.Encode.Generic (gEncodeJson)
 import Data.Argonaut.Parser (jsonParser)
 import Data.Lens (_Right, preview)
-import Reiterate.Topic (Topic(..))
+import Reiterate.Topic (Phase(..), Topic(..), TopicID, freshTopicID)
 import Reiterate.Topic.Algebra (Topics(..))
 import Stuff
 
 runTopics :: Storage -> Topics ~> IOSync
 runTopics st (GetTopics next) = next \ Right <$> getTopics st
+runTopics st (FreshTopic next) = next \ Right <$> freshTopic st
 runTopics st (SaveTopic topic next) = next \ Right <$> saveTopic st topic
 
 getTopics :: Storage -> IOSync (List Topic)
 getTopics = map (map snd) \ getItems (preview _Right \ (gDecodeJson <=< jsonParser))
+
+freshTopic :: Storage -> IOSync TopicID
+freshTopic st = do
+  tid <- freshTopicID
+  let topic = Topic tid "New Topic" Interested
+  saveTopic st topic
+  pure tid
 
 saveTopic :: Storage -> Topic -> IOSync Unit
 saveTopic st t@(Topic tid _ _) = liftEff $

@@ -1,10 +1,13 @@
 module Reiterate.Topic
   ( TopicID(..)
+  , freshTopicID
+
   , Topic(..)
 
   , Phase(..)
   ) where
 
+import Crypt.Random (randomUUID4)
 import Data.Generic (class Generic)
 import Stuff
 
@@ -17,6 +20,11 @@ derive instance nt :: Newtype TopicID _
 derive instance gt :: Generic TopicID
 instance st :: Show TopicID where
   show (TopicID t) = "(TopicID " <> show t <> ")"
+
+freshTopicID :: IOSync TopicID
+freshTopicID = TopicID <$> randomUUID4
+
+--------------------------------------------------------------------------------
 
 data Topic = Topic TopicID String Phase
 derive instance go :: Generic Topic
