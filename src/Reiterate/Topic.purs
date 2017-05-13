@@ -9,6 +9,7 @@ module Reiterate.Topic
 
 import Crypt.Random (randomUUID4)
 import Data.Generic (class Generic)
+import Data.String.NonEmpty (NonEmptyString)
 import Stuff
 
 --------------------------------------------------------------------------------
@@ -26,7 +27,7 @@ freshTopicID = TopicID <$> randomUUID4
 
 --------------------------------------------------------------------------------
 
-data Topic = Topic String Phase
+data Topic = Topic NonEmptyString Phase
 derive instance go :: Generic Topic
 instance so :: Show Topic where
   show (Topic n p) = "(Topic " <> show n <> " " <> show p <> ")"

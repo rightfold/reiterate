@@ -9,20 +9,23 @@ import Data.Argonaut.Decode.Generic (gDecodeJson)
 import Data.Argonaut.Encode.Generic (gEncodeJson)
 import Data.Argonaut.Parser (jsonParser)
 import Data.Lens (_Right, preview)
+import Data.Map (Map)
+import Data.Map as Map
+import Data.String.NonEmpty (NonEmptyString(..))
 import Reiterate.Topic (Phase(..), Topic(..), TopicID, freshTopicID)
 import Reiterate.Topic.Algebra (Topics(..))
 import Stuff
 
 freshTopic' :: Topic
-freshTopic' = Topic "New Topic" Interested
+freshTopic' = Topic (NonEmptyString 'N' "ew Topic") Interested
 
 runTopics :: Storage -> Topics ~> IOSync
 runTopics st (GetTopics next) = next \ Right <$> getTopics st
 runTopics st (FreshTopic next) = next \ Right <$> freshTopic st
 runTopics st (SaveTopic tid topic next) = next \ Right <$> saveTopic st tid topic
 
-getTopics :: Storage -> IOSync (List (TopicID /\ Topic))
-getTopics = getItems \keyS valueS -> preview _Right $
+getTopics :: Storage -> IOSync (Map TopicID Topic)
+getTopics = map Map.fromFoldable \ getItems \keyS valueS -> preview _Right $
   (/\) <$> (gDecodeJson <=< jsonParser $ keyS)
        <*> (gDecodeJson <=< jsonParser $ valueS)
 
